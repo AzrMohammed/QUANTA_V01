@@ -34,7 +34,7 @@ MEDIA_URL = '/media/'
 SECRET_KEY = '(vmbp7%!xguw1m^z)z9vn4^68u4x&st!0%w3o=u54%wc&ec!d9'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 
 # STATIC_ROOT = "app-root/repo/wsgi/static"
