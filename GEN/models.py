@@ -108,6 +108,7 @@ class BrandBasicInfo(models.Model):
     brand_core_category = models.ForeignKey(BrandCoreCategory, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=250, default=dbconstants.VAL_STR_DEFAULT, null=True)
     code = models.CharField(max_length=100, default=dbconstants.VAL_STR_DEFAULT, null=True)
+    search_prefix = models.CharField(max_length=100, default=dbconstants.VAL_STR_DEFAULT, null=True)
     description = models.TextField(default=dbconstants.VAL_STR_DEFAULT, null=True, blank=True)
     address_text = models.TextField(default=dbconstants.VAL_STR_DEFAULT, null=True, blank=True)
     branch_base_image = models.ImageField(upload_to='brand_images', blank=True)

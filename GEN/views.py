@@ -2341,6 +2341,8 @@ def authenticate_app_user(request):
             user_data["name"] = user.first_name
             user_data["user_type"] = user_profile.app_user_type.code
             user_data["brand_id"] = user_profile.brand.id
+            user_data["brand_code"] = user_profile.brand.code
+            user_data["brand_search_prefix"] = user_profile.brand.search_prefix
             user_data["user_id"] = user_profile.id
             if user_profile.brandbranch is not None:
                 user_data["brand_branch_id"] = user_profile.brandbranch.id
@@ -2365,17 +2367,24 @@ def validate_user(request):
 
 
         user_profile1 = UserProfileInfo.objects.filter(phone_primary=phone)
-        brand_c = BrandBasicInfo.objects.get(code=brand_code)
+        brand_c = BrandBasicInfo.objects.filter(code=brand_code)
 
+        if not brand_c:
+            response_data = {}
+            response_data["ERROR_CODE"] = 1
+            return HttpResponse(json.dumps(
+                {"SUCCESS": False, "RESPONSE_DATA": response_data, "RESPONSE_MESSAGE": "Invalid Brand Code"}),
+                content_type="application/json")
 
-        if not user_profile1:
+        elif not user_profile1:
 
             response_data = {}
             response_data["brand_id"] = brand_c.id
-
+            response_data["ERROR_CODE"] = 2
             return HttpResponse(json.dumps({"SUCCESS":False, "RESPONSE_DATA": response_data,  "RESPONSE_MESSAGE":"User Not Exist"}), content_type="application/json")
         else:
             user_profile = UserProfileInfo.objects.get(phone_primary=phone)
+            brand_c = BrandBasicInfo.objects.get(code=brand_code)
             lang = received_json_data["user_lang"]
             user_profile.user_language = lang
             user_profile.save()
