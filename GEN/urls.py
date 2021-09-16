@@ -4,6 +4,8 @@ from GEN import views
 
 app_name = 'GEN'
 
+
+
 urlpatterns =[
 path('',views.get_html_index, name = "index"),
 path('Quanta/',views.get_html_safez, name = ""),
