@@ -14,14 +14,15 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 
 APP_DIR_GEN = os.path.join(BASE_DIR, "GEN")
 TEMPLATES_DIR_GEN = os.path.join(APP_DIR_GEN, "template")
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
-# STATIC_DIR = os.path.join(BASE_DIR, "static")
 
-PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
-STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+STATIC_ROOT = os.path.join(PROJECT_DIR, 'static_root')
 
 parent_dir = os.path.abspath(os.path.dirname(__file__) + '/..')
 MEDIA_ROOT = os.path.join(parent_dir, 'media/')
@@ -34,12 +35,11 @@ MEDIA_URL = '/media/'
 SECRET_KEY = '(vmbp7%!xguw1m^z)z9vn4^68u4x&st!0%w3o=u54%wc&ec!d9'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 
 # STATIC_ROOT = "app-root/repo/wsgi/static"
 #
-# STATIC_URL = '/static/'
 #
 # STATICFILES_DIRS = (
 #     ('assets', 'app-root/repo/wsgi/openshift/static'),
@@ -91,7 +91,7 @@ FCM_DJANGO_SETTINGS = {
 #         "WP_PRIVATE_KEY": "/path/to/your/private.pem",
 #         "WP_CLAIMS": {'sub': "mailto: development@example.com"}
 # }
-
+# python manage.py collectstatic
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -187,7 +187,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS =[
-# STATIC_DIR,
+STATIC_DIR, 'staticfiles'
 ]
 
 LOGIN_URL = '/GEN/user_login'
