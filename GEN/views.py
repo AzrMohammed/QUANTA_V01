@@ -2379,6 +2379,7 @@ def validate_user(request):
         elif not user_profile1:
 
             response_data = {}
+            brand_c = BrandBasicInfo.objects.get(code=brand_code)
             response_data["brand_id"] = brand_c.id
             response_data["ERROR_CODE"] = 2
             return HttpResponse(json.dumps({"SUCCESS":False, "RESPONSE_DATA": response_data,  "RESPONSE_MESSAGE":"User Not Exist"}), content_type="application/json")
