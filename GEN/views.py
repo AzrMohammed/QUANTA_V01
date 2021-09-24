@@ -466,6 +466,7 @@ class CreateProduct(APIView):
 
 
 
+
         proceed_current_process_model, serializer_current_process_model = support_serializer_submit.validate_save_instance(current_process_model, current_process_model_data)
 
 
@@ -2919,33 +2920,49 @@ class SymptomSet(APIView):
 class StoreBranchListAdmin(APIView):
 
     def post(self,request):
-        received_json_data = request.POST
-        api_lang = get_api_language_preference(received_json_data)
-        print(":cameggg");
-
-        category = BrandBranchBasicInfo.objects.all()
-        serializer_cat = BrandBranchBasicInfoSerializerAD(category, many=True)
+        # received_json_data = request.POST
+        # api_lang = get_api_language_preference(received_json_data)
+        # print(":cameggg");
 
         base_data = {}
-        base_data["branchlist"] = serializer_cat.data
+        base_data["branchlist"] =[]
+
+        received_json_data = json.loads(request.body)
+        # api_lang = get_api_language_preference(received_json_data)
+        #
+        if "brand_id" in received_json_data:
+            brand_id = received_json_data["brand_id"]
+            # branch_id = received_json_data["branch_id"]
+
+            category = BrandBranchBasicInfo.objects.filter(brand__id = brand_id)
+            serializer_cat = BrandBranchBasicInfoSerializerAD(category, many=True)
+
+            base_data["branchlist"] = serializer_cat.data
 
         return Response(base_data)
 
 
 class StoreBranchList(APIView):
 
-    def get(self,request):
+    def post(self,request):
         print(":cameggg");
         #
-        category = BrandBranchBasicInfo.objects.filter(is_available=True)
-        serializer_cat = BrandBranchBasicInfoSerializer(category, many=True)
 
         base_data = {}
-        base_data["branchlist"] = serializer_cat.data
+        base_data["branchlist"] =[]
+
+        received_json_data = json.loads(request.body)
+        # api_lang = get_api_language_preference(received_json_data)
+        #
+        if "brand_id" in received_json_data:
+            brand_id = received_json_data["brand_id"]
+            category = BrandBranchBasicInfo.objects.filter(is_available=True, brand__id = brand_id)
+            serializer_cat = BrandBranchBasicInfoSerializer(category, many=True)
+            base_data["branchlist"] = serializer_cat.data
 
         return Response(base_data)
 
-    def post(self,request):
+    def get(self,request):
         print(":cameggg");
 
         category = BrandBranchBasicInfo.objects.filter(is_available=True)
@@ -3049,8 +3066,8 @@ class BranchProductSupportDataCustomer(APIView):
         serializer_cat = ProductCategorySerializer(category, many=True)
         product_base = ProductBase.objects.filter(id__in = product_base_servisable)
 
-
-        itemMeasuementUnit_base = ItemMeasuementUnit.objects.filter(is_available=True, brand__id = brand_id)
+        # , brand__id = brand_id
+        itemMeasuementUnit_base = ItemMeasuementUnit.objects.filter(is_available=True)
         serialiser_itemMeasuementUnit_base = ItemMeasuementUnitSerializer(itemMeasuementUnit_base, many=True)
 
         serializer_pro_base = ProductBaseSerializer(product_base, many=True)
@@ -3132,9 +3149,11 @@ class BranchProductListAdmin2(APIView):
 
 def get_paginated_data(queyset, page_no, page_size = GEN_Constants.ORDERS_LIST_COUNT_BUSINESS):
     # size = queyset.count()
-    end = page_no * page_size+1
+    end = page_no * page_size
     start = end-page_size
-    queryset = queyset[start-1:end]
+
+    print("tsgdfghdfhgfh", start, end)
+    queryset = queyset[start:end]
     return queryset
 
 
