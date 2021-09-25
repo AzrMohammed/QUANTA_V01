@@ -37,13 +37,14 @@ from .serialiserBase import EnterPriseForm, \
     ProductCategorySerializerBranchUser, ServisableProductSerializerBranchUser, ServisableProductSerializerCustomer, \
     CustomerAllOrderSerializer, BranchDetailAdminSerializer, ProductCategorySerializerAd, StoreUomSerializer, \
     BrandBranchBasicInfoSerializerAD, BranchAgentDetailSerializer, BranchServisableProductSerializerAd, \
-    ProductADFeedSerializer, BrandOrderListSerializer, OrderDetail01SerializerWithActions, OrderAgentResponseSerializer
+    ProductADFeedSerializer, BrandOrderListSerializer, OrderDetail01SerializerWithActions, OrderAgentResponseSerializer, \
+    CustomerUpcomingOrderSerializer, CustomerOtherOrderSerializer
 
 import base64
 from django.core.files.base import ContentFile
 from datetime import datetime, timedelta
 from django.db.models import Sum
-
+from django.db.models import Q
 from .value_constant import get_display_translated_value
 
 def change_order_status_auto(request):
@@ -995,6 +996,7 @@ def proceedPush(brand_id, app_user_type, device_id, title, message, datapayload)
 
     # api_key = GEN_Constants.getFcmApiKey(app_user_type)
 
+
     brand_app_details = db_operations_support.get_db_object_g_last(BrandAppspecificDetails, {"brand_id": brand_id})
 
     if app_user_type == GEN_Constants.APP_USER_TYPE_CUSTOMER:
@@ -1334,14 +1336,36 @@ class CustomerOrderUpcoming(APIView):
         print(received_json_data)
 
         phone = received_json_data["user_phone"]
+        brand_id = received_json_data["brand_id"]
         user_p = UserProfileInfo.objects.get(phone_primary=phone)
 
 
 
+
+        # // status completed ()
+# request time > current time (D) || (D | Q)
+# order status filter (D) || (D | Q)
+
+        # ORDER_STATUS_INITIATED = "ORD_INITIATED"
+        # ORDER_STATUS_AGENT_APPROVED = "ORD_APPROVED"
+        # ORDER_STATUS_AGENT_REJECTED_NO_SLOT = "ORD_REJECTED_NO_SLOT"
+        # ORDER_STATUS_AGENT_REJECTED_OTHERS = "ORD_REJECTED_OTHERS"
+        # ORDER_STATUS_CANCELLED = "ORD_CANCELLED"
+        # ORDER_STATUS_NO_SHOW = "ORD_NO_SHOW"
+        # ORDER_STATUS_ONGOING = "ORD_ONGOING"
+        # ORDER_STATUS_COMPLETED = "ORD_COMPLETED"
+
         # order_list = Order.objects.filter(user_customer = user_p, order_status__code = GEN_Constants.ORDER_STATUS_AGENT_APPROVED).order_by('schedule_requested_time')
-        order_list = Order.objects.filter(schedule_requested_time__gte = datetime.now()).order_by(
-            'schedule_requested_time')
-        order_list_s = CustomerAllOrderSerializer(order_list, many=True)
+
+
+
+
+        order_list = Order.objects.filter(brand__id = brand_id, user_customer__id = user_p.id, schedule_requested_time__gte = datetime.now()).order_by(
+        'schedule_requested_time').exclude(order_status__code=GEN_Constants.ORDER_STATUS_COMPLETED)
+
+            # .exclude(order_status__code=GEN_Constants.ORDER_STATUS_AGENT_APPROVED)
+            # 'schedule_requested_time', Q(order_status__code=GEN_Constants.ORDER_STATUS_INITIATED) | Q(order_status__code=GEN_Constants.ORDER_STATUS_AGENT_APPROVED)| Q(order_status__code=GEN_Constants.ORDER_STATUS_AGENT_APPROVED))
+        order_list_s = CustomerUpcomingOrderSerializer(order_list, many=True)
 
 
         base_data = {}
@@ -1356,16 +1380,23 @@ class CustomerOrderOthers(APIView):
     def post(self,request):
         received_json_data=json.loads(request.body)
         api_lang = get_api_language_preference(received_json_data)
+        brand_id = received_json_data["brand_id"]
         print("reee")
         print(received_json_data)
 
         phone = received_json_data["user_phone"]
         user_p = UserProfileInfo.objects.get(phone_primary=phone)
         # order_list = Order.objects.filter(user_customer = user_p).exclude(order_status__code = GEN_Constants.ORDER_STATUS_AGENT_APPROVED).order_by('-updated_at')
-        order_list = Order.objects.filter(schedule_requested_time__lt = datetime.now()).order_by(
-            'schedule_requested_time')
+        order_list_ong = Order.objects.filter(brand__id = brand_id, user_customer__id = user_p.id, schedule_requested_time__gte = datetime.now()).order_by(
+        'schedule_requested_time').exclude(order_status__code=GEN_Constants.ORDER_STATUS_COMPLETED)
+        exclude_ids = order_list_ong.values('id')
 
-        order_list_s = CustomerAllOrderSerializer(order_list, many=True)
+        print("exclude_idsexclude_ids", exclude_ids)
+        order_list = Order.objects.filter(brand__id = brand_id, user_customer__id = user_p.id).exclude(id__in = exclude_ids)
+
+        # order_list = Order.objects.filter(brand__id = brand_id, user_customer__id = user_p.id, schedule_requested_time__lt = datetime.now()).order_by(
+        #     'schedule_requested_time')
+        order_list_s = CustomerOtherOrderSerializer(order_list, many=True)
 
 
         base_data = {}
@@ -1739,7 +1770,7 @@ class CreateOrder(APIView):
 
         if(servicable_criteria_q.count() == 0):
             proceed_current_process_model = False
-            payload = {"title":get_display_translated_value(value_constant.KEY_D_BOOKING_FAILED,api_lang), "message":get_display_translated_value(value_constant.KEY_D_BRANCH_OPERATIONAL_SELECTE_TIME,api_lang)}
+            payload = {"title":get_display_translated_value(value_constant.KEY_D_BOOKING_FAILED,api_lang), "code":value_constant.KEY_D_BRANCH_OPERATIONAL_SELECTE_TIME,  "message":get_display_translated_value(value_constant.KEY_D_BRANCH_OPERATIONAL_SELECTE_TIME,api_lang)}
 
 
         if proceed_current_process_model:

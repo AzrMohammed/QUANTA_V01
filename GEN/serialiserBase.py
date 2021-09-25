@@ -110,6 +110,149 @@ class OrderSerializer(serializers.ModelSerializer):
     def get_delivery_status(self, obj):
             return "None"
 
+class CustomerUpcomingOrderSerializer(serializers.ModelSerializer):
+    order_item = serializers.SerializerMethodField()
+    order_status = serializers.SerializerMethodField()
+    status_title = serializers.SerializerMethodField()
+    status_text = serializers.SerializerMethodField()
+
+    branch_lat = serializers.SerializerMethodField()
+    branch_long = serializers.SerializerMethodField()
+    branch_name = serializers.SerializerMethodField()
+    branch_address = serializers.SerializerMethodField()
+    g_map_query = serializers.SerializerMethodField()
+    phone = serializers.SerializerMethodField()
+    phone_secondary = serializers.SerializerMethodField()
+    action_criteria = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Order
+        fields = ['id', 'g_map_query', 'phone', 'phone_secondary', 'order_id', 'delivery_charges', 'schedule_requested_time', 'checked_in_time', 'order_status', 'order_item', 'status_title', 'status_text', 'branch_address', 'branch_name', 'branch_lat', 'branch_long', 'action_criteria']
+
+
+    def get_action_criteria(self, obj):
+        actions = {"show_directions": False, "show_checkin_code": False}
+        if obj.order_status.code == GEN_Constants.ORDER_STATUS_INITIATED or obj.order_status.code == GEN_Constants.ORDER_STATUS_AGENT_APPROVED:
+            actions["show_directions"] = True
+
+        if obj.order_status.code == GEN_Constants.ORDER_STATUS_AGENT_APPROVED:
+            actions["show_checkin_code"] = True
+
+        return actions
+
+    def get_branch_name(self, obj):
+        return obj.branch.name
+
+    def get_branch_address(self, obj):
+        return obj.branch.address_text
+
+    def get_branch_lat(self, obj):
+        return obj.branch.location_latitude
+
+    def get_branch_long(self, obj):
+        return obj.branch.location_langitude
+
+    def get_g_map_query(self, obj):
+        return "geo:0,0?q="+obj.branch.g_address_dump
+        # return "geo:0,0?q=Naturals Salon and Spa, Landons Road, Kilpauk, Chennai, Tamil Nadu, India"
+
+    def get_phone(self, obj):
+        return obj.branch.phone_primary
+
+    def get_phone_secondary(self, obj):
+        return obj.branch.phone_secondary
+
+    def get_status_title(self, obj):
+        return obj.get_status_title()
+
+    def get_status_text(self, obj):
+        return obj.get_status_text()
+
+    def get_order_status(self, obj):
+        if obj.order_status is not None:
+            return obj.order_status.code
+        else:
+            return None
+
+    def get_order_item(self, obj):
+
+        order_items = OrderItem.objects.filter(order=obj).order_by('-created_at')
+
+        order_items_s = OrderItemSerializer(order_items, many=True).data
+        return order_items_s
+
+class CustomerOtherOrderSerializer(serializers.ModelSerializer):
+    order_item = serializers.SerializerMethodField()
+    order_status = serializers.SerializerMethodField()
+    status_title = serializers.SerializerMethodField()
+    status_text = serializers.SerializerMethodField()
+
+    branch_lat = serializers.SerializerMethodField()
+    branch_long = serializers.SerializerMethodField()
+    branch_name = serializers.SerializerMethodField()
+    branch_address = serializers.SerializerMethodField()
+    g_map_query = serializers.SerializerMethodField()
+    phone = serializers.SerializerMethodField()
+    phone_secondary = serializers.SerializerMethodField()
+    action_criteria = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Order
+        fields = ['id', 'g_map_query', 'phone', 'phone_secondary', 'order_id', 'delivery_charges', 'schedule_requested_time', 'checked_in_time', 'order_status', 'order_item', 'status_title', 'status_text', 'branch_address', 'branch_name', 'branch_lat', 'branch_long', 'action_criteria']
+
+
+    def get_action_criteria(self, obj):
+        actions = {"show_directions": False, "show_checkin_code": False}
+        # if obj.order_status.code == GEN_Constants.ORDER_STATUS_INITIATED or obj.order_status.code == GEN_Constants.ORDER_STATUS_AGENT_APPROVED:
+        #     actions["show_directions"] = True
+        #
+        # if obj.order_status.code == GEN_Constants.ORDER_STATUS_AGENT_APPROVED:
+        #     actions["show_checkin_code"] = True
+
+        return actions
+
+    def get_branch_name(self, obj):
+        return obj.branch.name
+
+    def get_branch_address(self, obj):
+        return obj.branch.address_text
+
+    def get_branch_lat(self, obj):
+        return obj.branch.location_latitude
+
+    def get_branch_long(self, obj):
+        return obj.branch.location_langitude
+
+    def get_g_map_query(self, obj):
+        return "geo:0,0?q="+obj.branch.g_address_dump
+        # return "geo:0,0?q=Naturals Salon and Spa, Landons Road, Kilpauk, Chennai, Tamil Nadu, India"
+
+    def get_phone(self, obj):
+        return obj.branch.phone_primary
+
+    def get_phone_secondary(self, obj):
+        return obj.branch.phone_secondary
+
+    def get_status_title(self, obj):
+        return obj.get_status_title()
+
+    def get_status_text(self, obj):
+        return obj.get_status_text()
+
+    def get_order_status(self, obj):
+        if obj.order_status is not None:
+            return obj.order_status.code
+        else:
+            return None
+
+    def get_order_item(self, obj):
+
+        order_items = OrderItem.objects.filter(order=obj).order_by('-created_at')
+
+        order_items_s = OrderItemSerializer(order_items, many=True).data
+        return order_items_s
+
+
 class CustomerAllOrderSerializer(serializers.ModelSerializer):
     order_item = serializers.SerializerMethodField()
     order_status = serializers.SerializerMethodField()
@@ -267,9 +410,20 @@ class OrderAgentResponseSerializer(serializers.ModelSerializer):
 
         response = {"status": False, "status_title":"Booking Not Confirmed", "status_text":"Booking has not been confirmed on requested time. Please try scheduling on some other time" }
         if obj.order_status is not None:
+
             if obj.order_status.code == GEN_Constants.ORDER_STATUS_AGENT_APPROVED:
                 response = {"status": True, "status_title":get_display_translated_value(value_constant.KEY_D_BOOKING_CONFIRMED),
                             "status_text":get_display_translated_value(value_constant.KEY_D_BOOKING_SCHEDULED_REQUEST_TIME)}
+            elif obj.order_status.code == GEN_Constants.ORDER_STATUS_ONGOING:
+                response = {"status": True, "status_title":get_display_translated_value(value_constant.KEY_D_ONGOING),
+                            "status_text":get_display_translated_value(value_constant.KEY_D_APPOINTMENT_MARKED_AS_ONGOING)}
+            elif obj.order_status.code == GEN_Constants.ORDER_STATUS_COMPLETED:
+                response = {"status": True, "status_title":get_display_translated_value(value_constant.KEY_D_COMPLETED),
+                            "status_text":get_display_translated_value(value_constant.KEY_D_BOOKING_MARKED_AS_COMPLETED)}
+            elif obj.order_status.code == GEN_Constants.ORDER_STATUS_CANCELLED:
+                response = {"status": False, "status_title":get_display_translated_value(value_constant.KEY_D_ORDER_REJECTED),
+                            "status_text":get_display_translated_value(value_constant.KEY_D_ORDER_MARKED_AS_REJECTED)}
+
         return  response
 
 
