@@ -52,7 +52,7 @@ def change_order_status_auto(request):
     print("1")
     change_order_status_upon_time_expiry()
     print("3")
-    return HttpResponse(json.dumps({"SUCCESS":True, "RESPONSE_MESSAGE":"Successa"}),
+    return HttpResponse(json.dumps({"SUCCESS":True, "time":datetime.now(), "RESPONSE_MESSAGE":"Successa"}),
                         content_type="application/json")
 
 
@@ -95,7 +95,8 @@ def change_order_status_upon_time_expiry(expiry_checked_in = 7, expiry_scheduled
 
     print("exp_dt_requested")
     print(exp_dt_requested)
-    qs_order_requested = Order.objects.filter(schedule_requested_time__lt = exp_dt_requested, order_status__code=GEN_Constants.ORDER_STATUS_INITIATED)
+    exp_dt_intitiated = datetime.now()
+    qs_order_requested = Order.objects.filter(schedule_requested_time__lt = exp_dt_intitiated, order_status__code=GEN_Constants.ORDER_STATUS_INITIATED)
 
     order_status_req_q = db_operations_support.get_db_object_g(OrderStatus,
                                                            {"code": GEN_Constants.ORDER_STATUS_AGENT_REJECTED_NO_SLOT})
