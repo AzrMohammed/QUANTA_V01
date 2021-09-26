@@ -387,7 +387,7 @@ class Order(models.Model):
             elif order_status == GEN_Constants.ORDER_STATUS_AGENT_REJECTED_OTHERS:
                 status = get_string_value_by_user(value_constant.KEY_D_ORDER_REJECTED)
             elif order_status == GEN_Constants.ORDER_STATUS_NO_SHOW:
-                status = get_string_value_by_user(value_constant.KEY_D_NOT_REACHABLE)
+                status = get_string_value_by_user(value_constant.KEY_D_BOOKING_NO_SHOW)
             elif order_status == GEN_Constants.ORDER_STATUS_ONGOING:
                 status = get_string_value_by_user(value_constant.KEY_D_ONGOING)
             elif order_status == GEN_Constants.ORDER_STATUS_COMPLETED:
@@ -412,7 +412,7 @@ class Order(models.Model):
             elif order_status == GEN_Constants.ORDER_STATUS_AGENT_REJECTED_OTHERS:
                 status = get_string_value_by_user(value_constant.KEY_D_NOT_OPERATING_REQUESTED_TIME)
             elif order_status == GEN_Constants.ORDER_STATUS_NO_SHOW:
-                status = get_string_value_by_user(value_constant.KEY_D_CHECK_IN_APPOINTMENT)
+                status = get_string_value_by_user(value_constant.KEY_D_BOOKING_NO_SHOW)
             elif order_status == GEN_Constants.ORDER_STATUS_ONGOING:
                 status = get_string_value_by_user(value_constant.KEY_D_APPOINTMENT_MARKED_AS_ONGOING)
             elif order_status == GEN_Constants.ORDER_STATUS_COMPLETED:
