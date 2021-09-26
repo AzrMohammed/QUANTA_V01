@@ -52,7 +52,7 @@ def change_order_status_auto(request):
     print("1")
     change_order_status_upon_time_expiry()
     print("3")
-    return HttpResponse(json.dumps({"SUCCESS":True, "RESPONSE_MESSAGE":"Successa"}),
+    return HttpResponse(json.dumps({"SUCCESS":True, "time":datetime.now(), "RESPONSE_MESSAGE":"Successa"}),
                         content_type="application/json")
 
 
