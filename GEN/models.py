@@ -393,7 +393,7 @@ class Order(models.Model):
             elif order_status == GEN_Constants.ORDER_STATUS_COMPLETED:
                 status = get_string_value_by_user(value_constant.KEY_D_COMPLETED)
             elif order_status == GEN_Constants.ORDER_STATUS_CANCELLED:
-                status = get_string_value_by_user(value_constant.ORDER_STATUS_CANCELLED)
+                status = get_string_value_by_user(value_constant.KEY_D_ORDER_STATUS_CANCELLED)
 
         return status
 
