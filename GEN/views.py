@@ -1375,6 +1375,31 @@ class CustomerOrderUpcoming(APIView):
 
         return Response(base_data)
 
+class GetBranchBookingRequestCount(APIView):
+    def post(self,request):
+        received_json_data=json.loads(request.body)
+        api_lang = get_api_language_preference(received_json_data)
+        brand_id = received_json_data["brand_id"]
+        branch_id = received_json_data["brand_branch_id"]
+
+        home_data = {
+            "ongoing":0,
+            "scheduled":0,
+            "pending":2,
+            "all":0,
+
+        }
+
+        base_data = {}
+        base_data["home"] =home_data
+        # base_data["delivery_text"] = "Order will bw delivered by 11 AM tomorrow"
+        # base_data["status_text"] = "RECEIVED"
+
+        return Response(base_data)
+
+
+
+
 class CustomerOrderOthers(APIView):
 
     def post(self,request):
@@ -1391,7 +1416,6 @@ class CustomerOrderOthers(APIView):
         'schedule_requested_time').exclude(order_status__code=GEN_Constants.ORDER_STATUS_COMPLETED)
         exclude_ids = order_list_ong.values('id')
 
-        print("exclude_idsexclude_ids", exclude_ids)
         order_list = Order.objects.filter(brand__id = brand_id, user_customer__id = user_p.id).exclude(id__in = exclude_ids)
 
         # order_list = Order.objects.filter(brand__id = brand_id, user_customer__id = user_p.id, schedule_requested_time__lt = datetime.now()).order_by(
