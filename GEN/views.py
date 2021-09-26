@@ -51,7 +51,7 @@ from .value_constant import get_display_translated_value
 def change_order_status_auto(request):
     print("1")
     change_order_status_upon_time_expiry()
-    print("3")
+    print("3a")
     return HttpResponse(json.dumps({"SUCCESS":True, "time":json.dumps(datetime.now()), "RESPONSE_MESSAGE":"Successa"}),
                         content_type="application/json")
 
