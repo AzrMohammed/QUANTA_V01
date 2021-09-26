@@ -1,4 +1,5 @@
 import datetime
+from datetime import datetime, timedelta
 import json
 import random
 import string
@@ -258,7 +259,7 @@ class BrandOrders(APIView):
     def post(self, request):
         received_json_data=json.loads(request.body)
         api_lang = get_api_language_preference(received_json_data)
-        print("reee")
+        print("reee============================")
         print(received_json_data)
         brand_id = received_json_data["brand_id"]
         order_list = Order.objects.filter(brand__id = brand_id)
@@ -1214,6 +1215,8 @@ def proceed_client_approval_notification(order_base_id,api_lang):
 
     if order_q.order_status.code == GEN_Constants.ORDER_STATUS_AGENT_APPROVED:
         title =get_display_translated_value(value_constant.KEY_D_BOOKING_CONFIRMED,api_lang)
+    elif order_q.order_status.code == GEN_Constants.ORDER_STATUS_NO_SHOW:
+        title =get_display_translated_value(value_constant.KEY_D_NOT_REACHABLE,api_lang)
 
     brand_id = order_q.brand.id
 
@@ -1380,15 +1383,27 @@ class GetBranchBookingRequestCount(APIView):
         received_json_data=json.loads(request.body)
         api_lang = get_api_language_preference(received_json_data)
         brand_id = received_json_data["brand_id"]
-        branch_id = received_json_data["brand_branch_id"]
+        brand_branch_id = received_json_data["brand_branch_id"]
 
         home_data = {
             "ongoing":0,
             "scheduled":0,
-            "pending":2,
+            "pending":0,
             "all":0,
 
         }
+
+        # //nexxt 1 hr
+        # pending
+
+        pending_count = Order.objects.filter(brand__id = brand_id, branch__id = brand_branch_id, order_status__code=GEN_Constants.ORDER_STATUS_INITIATED).count()
+        home_data["pending"] = pending_count
+
+        date_scheduled = datetime.now() + timedelta(hours = 2)
+                         # + datetime.timedelta(hours=1)
+        scheduled_count = Order.objects.filter(brand__id=brand_id, branch__id=brand_branch_id, schedule_requested_time__lte = date_scheduled,
+                                             order_status__code=GEN_Constants.ORDER_STATUS_AGENT_APPROVED, ).count()
+        home_data["scheduled"] = scheduled_count
 
         base_data = {}
         base_data["home"] =home_data
