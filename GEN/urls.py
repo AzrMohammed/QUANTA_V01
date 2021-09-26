@@ -60,6 +60,7 @@ path('OrderCancelledByAgent/', views.OrderCancelledByAgent.as_view(), name = "Or
 path('OrderMarkedNoShowByAgent/', views.OrderMarkedNoShowByAgent.as_view(), name = "OrderMarkedNoShowByAgent"),
 path('OrderMarkAsCompleted/', views.OrderMarkAsCompleted.as_view(), name = "OrderMarkAsCompleted"),
 path('OrderMarkAsCheckedIn/', views.OrderMarkAsCheckedIn.as_view(), name = "OrderMarkAsCheckedIn"),
+path('GetBranchBookingRequestCount/', views.GetBranchBookingRequestCount.as_view(), name = "GetBranchBookingRequestCount"),
 
 path('SamplePush/', views.SamplePush.as_view(), name = "SamplePush"),
 path('BrandOrders/', views.BrandOrders.as_view(), name = "BrandOrders"),
