@@ -1401,8 +1401,11 @@ class GetBranchBookingRequestCount(APIView):
 
         date_scheduled = datetime.now() + timedelta(hours = 2)
                          # + datetime.timedelta(hours=1)
-        scheduled_count = Order.objects.filter(brand__id=brand_id, branch__id=brand_branch_id, schedule_requested_time__lte = date_scheduled,
-                                             order_status__code=GEN_Constants.ORDER_STATUS_AGENT_APPROVED, ).count()
+        # , schedule_requested_time__lte = date_scheduled,
+        scheduled_count = Order.objects.filter(brand__id=brand_id, branch__id=brand_branch_id,
+                                             order_status__code=GEN_Constants.ORDER_STATUS_AGENT_APPROVED).count()
+        # print("ntscheduled_count===")
+        # print("ntscheduled_count===", date_scheduled)
         home_data["scheduled"] = scheduled_count
 
         base_data = {}

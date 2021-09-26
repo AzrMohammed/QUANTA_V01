@@ -549,8 +549,8 @@ class BrandOrderListSerializer(serializers.ModelSerializer):
         return {"name":(obj.user_customer.getUserDisplayName()), "phone":obj.user_customer.phone_primary}
 
     def get_order_status(self, obj):
-        print("order idd")
-        print(obj.order_id)
+        # print("order idd")
+        # print(obj.order_id)
         return str(obj.order_status.code)
 
     def get_status_title(self, obj):
@@ -584,8 +584,8 @@ class BranchOrderListSerializer(serializers.ModelSerializer):
         return str(obj.user_customer.getUserDisplayName())
 
     def get_status_code(self, obj):
-        print("order idd")
-        print(obj.order_id)
+        # print("order idd")
+        # print(obj.order_id)
         return str(obj.order_status.code)
 
     def get_scheduled_at(self, obj):
