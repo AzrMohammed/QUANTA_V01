@@ -131,9 +131,12 @@ class CustomerUpcomingOrderSerializer(serializers.ModelSerializer):
 
 
     def get_action_criteria(self, obj):
-        actions = {"show_directions": False, "show_checkin_code": False}
+        actions = {"show_directions": False, "show_checkin_code": False, "show_cancel_option":False}
         if obj.order_status.code == GEN_Constants.ORDER_STATUS_INITIATED or obj.order_status.code == GEN_Constants.ORDER_STATUS_AGENT_APPROVED:
             actions["show_directions"] = True
+
+        if obj.order_status.code == GEN_Constants.ORDER_STATUS_INITIATED or obj.order_status.code == GEN_Constants.ORDER_STATUS_AGENT_APPROVED:
+            actions["show_cancel_option"] = True
 
         if obj.order_status.code == GEN_Constants.ORDER_STATUS_AGENT_APPROVED:
             actions["show_checkin_code"] = True
