@@ -1132,6 +1132,41 @@ class OrderCancelledByAgent(APIView):
         base_data = {"SUCCESS":True, "RESPONSE_MESSAGE":get_display_translated_value(value_constant.KEY_D_ORDER_MARKED_AS_REJECTED,api_lang)}
         return Response(base_data)
 
+class OrderCancelledByCustomer(APIView):
+
+    def post(self,request):
+        received_json_data=json.loads(request.body)
+        api_lang = get_api_language_preference(received_json_data)
+
+
+        print("reee")
+        print(received_json_data)
+
+        order_base_id = received_json_data["order_base_id"]
+
+
+
+        order_status_q= db_operations_support.get_db_object_g(OrderStatus, {"code": GEN_Constants.ORDER_STATUS_CANCELLED})
+
+        order_dataset = {}
+
+        order_dataset["id"] = order_base_id
+        order_dataset["order_status"] = order_status_q.id
+
+        proceed_current_process_model, serializer_current_process_model = support_serializer_submit.validate_save_instance(Order, order_dataset)
+
+        if proceed_current_process_model == False:
+            print("error savin")
+            print(serializer_current_process_model.errors)
+
+        # if proceed_current_process_model:
+        #     # OrderRejectedByAgent
+        #     proceed_client_approval_notification(order_base_id, api_lang)
+
+
+        base_data = {"SUCCESS":True, "RESPONSE_MESSAGE":get_display_translated_value(value_constant.KEY_D_ORDER_STATUS_CANCELLED, api_lang)}
+        return Response(base_data)
+
 class OrderRejectedByAgent(APIView):
 
     def post(self,request):
